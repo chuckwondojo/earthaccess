@@ -3,6 +3,7 @@ description: Install earthaccess Python package and testing dependencies
 
 inputs:
   python-version:
+    description: Version of Python to use
     required: true
 
 runs:
