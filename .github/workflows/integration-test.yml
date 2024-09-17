@@ -46,15 +46,14 @@ jobs:
         # will need to make sure the PR looks safe, and if so, manually re-run the
         # failed jobs.
         run: |
-          echo "User ${{ github.triggering_actor }} does not have permission to run integration tests."
-          echo "A maintainer must perform a security review and re-run this build, if the code is safe."
+          echo "User ${{ github.triggering_actor }} does not have permission to run integration tests." | tee -a $GITHUB_OUTPUT
+          echo "A maintainer must perform a security review and re-run this build, if the code is safe (see https://securitylab.github.com/resources/github-actions-preventing-pwn-requests)." | tee -a $GITHUB_OUTPUT
+          echo "Re-run at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" | tee -a $GITHUB_OUTPUT
           exit 1
       - name: Checkout source
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - uses: ./.github/actions/install-pkg
+      - name: Install package with dependencies
+        uses: ./.github/actions/install-pkg
         with:
           python-version: ${{ matrix.python-version }}
 
