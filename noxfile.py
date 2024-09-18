@@ -29,7 +29,8 @@ def tests(session: nox.Session) -> None:
 @nox.session
 def build_pkg(session: nox.Session) -> None:
     """Build a source distribution and binary distribution (wheel)."""
-    build_path = DIR.joinpath("build")
+    build_path = DIR / "build"
+
     if build_path.exists():
         shutil.rmtree(build_path)
 
