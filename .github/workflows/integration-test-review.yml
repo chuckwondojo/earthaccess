@@ -19,6 +19,9 @@ jobs:
           require: write
           username: ${{ github.triggering_actor }}
 
+      - run: |
+          echo 'link to failed job: ${{ github.event.workflow_run.html_url }}'
+          echo '${{ toJson(github) }}'
       - name: Add PR comment when user does not have write permission
         # The name of the output require-result is a bit confusing, but when its value
         # is 'false', it means that the triggering actor does NOT have the required
@@ -39,10 +42,7 @@ jobs:
           script: |
             const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
               commit_sha: context.sha,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              owner: ${{ github.event.workflow_run.head_repository.owner.name }},
+              repo: ${{ github.event.workflow_run.head_repository.name }}
             });
             console.log(prs);
-      - run: |
-          echo 'link to failed job: ${{ github.event.workflow_run.html_url }}'
-          echo '${{ toJson(github.event) }}'
