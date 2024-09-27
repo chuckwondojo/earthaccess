@@ -42,7 +42,7 @@ jobs:
           script: |
             const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
               commit_sha: context.sha,
-              owner: "${{ github.event.workflow_run.head_repository.owner.name }}",
+              owner: "${{ github.event.workflow_run.head_repository.owner.login }}",
               repo: "${{ github.event.workflow_run.head_repository.name }}",
             });
             console.log(prs);
