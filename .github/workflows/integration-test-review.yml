@@ -6,13 +6,43 @@ on:
     types: [completed]
 
 jobs:
-  integration-tests-failure:
+  integration-tests-pr-comment:
     runs-on: ubuntu-latest
     if: >
-      ${{
-        github.event.workflow_run.conclusion == 'failure' &&
-        github.event.workflow_run.event == 'pull_request_target'
-      }}
+      github.event.workflow_run.event == 'pull_request_target' &&
+      github.event.workflow_run.conclusion == 'failure'
     steps:
-      - run: |
-          echo '${{ toJson(github.event) }}'
+      - name: Fetch user permission
+        id: permission
+        uses: actions-cool/check-user-permission@v2
+        with:
+          require: write
+          username: ${{ github.triggering_actor }}
+
+      - name: Add PR comment when user does not have write permission
+        # The name of the output require-result is a bit confusing, but when its value
+        # is 'false', it means that the triggering actor does NOT have the required
+        # permission.
+        if: steps.permission.outputs.require-result == 'false'
+
+        # If the triggering actor does not have write permission, then we want to add
+        # a PR comment indicating a security review is required because we know that
+        # the integration tests "failed" due to lack of permission (i.e., they were
+        # actually "aborted" without running any tests).
+        # run: |
+        #   echo "User **${{ github.triggering_actor }}** does not have permission to run integration tests." >> $GITHUB_STEP_SUMMARY
+        #   echo "A maintainer must perform a security review and re-run this build, if the code is safe." >> $GITHUB_STEP_SUMMARY
+        #   echo "See [Keeping your GitHub Actions and workflows secure Part 1: Preventing pwn requests](https://securitylab.github.com/resources/github-actions-preventing-pwn-requests)." >> $GITHUB_STEP_SUMMARY
+        #   exit 1
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              commit_sha: context.sha,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            }));
+            console.log(prs);
+      # - run: |
+      #     echo 'link to failed job: ${{ github.event.workflow_run.html_url }}'
+      #     echo '${{ toJson(github.event) }}'
