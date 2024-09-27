@@ -37,12 +37,12 @@ jobs:
         #   echo "A maintainer must perform a security review and re-run this build, if the code is safe." >> $GITHUB_STEP_SUMMARY
         #   echo "See [Keeping your GitHub Actions and workflows secure Part 1: Preventing pwn requests](https://securitylab.github.com/resources/github-actions-preventing-pwn-requests)." >> $GITHUB_STEP_SUMMARY
         #   exit 1
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
               commit_sha: context.sha,
-              owner: ${{ github.event.workflow_run.head_repository.owner.name }},
-              repo: ${{ github.event.workflow_run.head_repository.name }}
+              owner: "${{ github.event.workflow_run.head_repository.owner.name }}",
+              repo: "${{ github.event.workflow_run.head_repository.name }}",
             });
             console.log(prs);
