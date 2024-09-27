@@ -43,8 +43,8 @@ jobs:
                 issue_number: number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body: "User **${{ github.triggering_actor }}** does not have permission to run"
-                  + " integration tests. A maintainer must perform a security review of the"
+                body: "User [${{ github.triggering_actor }}](${{ github.event.workflow_run.head_repository.owner.html_url }})"
+                  + " does not have permission to run integration tests. A maintainer must perform a security review of the"
                   + ` [code changes in this pull request](${html_url}/files) and re-run the`
                   + " [failed integration tests jobs](${{ github.event.workflow_run.html_url }}),"
                   + " if the code is deemed safe.",
