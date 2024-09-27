@@ -29,30 +29,24 @@ jobs:
         # a PR comment indicating a security review is required because we know that
         # the integration tests "failed" due to lack of permission (i.e., they were
         # actually "aborted" without running any tests).
-        # run: |
-        #   echo "User **${{ github.triggering_actor }}** does not have permission to run integration tests." >> $GITHUB_STEP_SUMMARY
-        #   echo "A maintainer must perform a security review and re-run this build, if the code is safe." >> $GITHUB_STEP_SUMMARY
-        #   echo "See [Keeping your GitHub Actions and workflows secure Part 1: Preventing pwn requests](https://securitylab.github.com/resources/github-actions-preventing-pwn-requests)." >> $GITHUB_STEP_SUMMARY
-        #   exit 1
         uses: actions/github-script@v7
         with:
           script: |
-            const prNumber = (await github.rest.repos.listPullRequestsAssociatedWithCommit({
+            const { number, html_url } = (await github.rest.repos.listPullRequestsAssociatedWithCommit({
               commit_sha: context.sha,
               owner: "${{ github.event.workflow_run.head_repository.owner.login }}",
               repo: "${{ github.event.workflow_run.head_repository.name }}",
-            })).data[0]?.number;
+            })).data[0] ?? {};
 
-            if (prNumber) {
+            if (number) {
               github.rest.issues.createComment({
-                issue_number: prNumber,
+                issue_number: number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body:
-                  "User **${{ github.triggering_actor }}** does not have permission to"
-                  + " to run integration tests. A maintainer must perform a security"
-                  + " review and re-run the"
-                  + " [failed jobs](${{ github.event.workflow_run.html_url }}), if the"
-                  + " code is deemed safe.",
+                body: "User **${{ github.triggering_actor }}** does not have permission to run"
+                  + " integration tests. A maintainer must perform a security review of the"
+                  + ` [code changes in this pull request](${html_url}/files) and re-run the`
+                  + " [failed integration tests jobs](${{ github.event.workflow_run.html_url }}),"
+                  + " if the code is deemed safe.",
               });
             }
