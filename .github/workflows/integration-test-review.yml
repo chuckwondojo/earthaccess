@@ -1,3 +1,5 @@
+name: Integration Tests PR Comment
+
 on:
   workflow_run:
     workflows: [Integration Tests]
