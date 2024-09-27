@@ -19,9 +19,6 @@ jobs:
           require: write
           username: ${{ github.triggering_actor }}
 
-      - run: |
-          echo 'link to failed job: ${{ github.event.workflow_run.html_url }}'
-          echo '${{ toJson(github) }}'
       - name: Add PR comment when user does not have write permission
         # The name of the output require-result is a bit confusing, but when its value
         # is 'false', it means that the triggering actor does NOT have the required
@@ -51,6 +48,11 @@ jobs:
                 issue_number: prNumber,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body: "Hello world!",
+                body:
+                  "User **${{ github.triggering_actor }}** does not have permission to"
+                  + " to run integration tests. A maintainer must perform a security"
+                  + " review and re-run the"
+                  + " [failed jobs](${{ github.event.workflow_run.html_url }}), if the"
+                  + " code is deemed safe.",
               });
             }
