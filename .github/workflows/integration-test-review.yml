@@ -6,10 +6,11 @@ on:
 jobs:
   integration-tests-failure:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    if: >
+      ${{
+        github.event.workflow_run.conclusion == 'failure' &&
+        github.event.workflow_run.event == 'pull_request_target'
+      }}
     steps:
-      # TODO determine if this failed due to lack of permissions from a
-      # pull_request_trigger event; if so, add PR comment w/link to failed build
       - run: |
-          echo 'The triggering workflow failed'
-          echo "${{ toJson(github.event.workflow_run) }}
+          echo '${{ toJson(github.event.workflow_run) }}'
