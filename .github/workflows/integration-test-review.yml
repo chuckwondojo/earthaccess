@@ -41,7 +41,7 @@ jobs:
               commit_sha: context.sha,
               owner: context.repo.owner,
               repo: context.repo.repo,
-            }));
+            });
             console.log(prs);
       # - run: |
       #     echo 'link to failed job: ${{ github.event.workflow_run.html_url }}'
